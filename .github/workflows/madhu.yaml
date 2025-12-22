@@ -96,3 +96,6 @@ jobs:
           curl --fail -u "${{ secrets.TOMCAT_USER_PROD }}:${{ secrets.TOMCAT_PASSWORD_PROD }}" \
           -T target/TrainBook-1.0.0-SNAPSHOT.war \
           "${{ secrets.TOMCAT_URL_PROD }}/manager/text/deploy?path=/TrainBook&update=true"
+
+
+          
