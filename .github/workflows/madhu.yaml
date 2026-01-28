@@ -27,8 +27,8 @@ jobs:
         run: |
           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=train-ticket-reservation \
-            -Dsonar.host.url=${{ secrets.SONAR_URL }} \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.host.url=http://18.144.48.151:9000 \
+            -Dsonar.token=sqa_fcb72959cdf23bb13d59307d3ec46e9c55a5fe42
 
       - name: Find WAR file
         run: echo "WAR_FILE=$(ls target/*.war | head -n 1)" >> $GITHUB_ENV
