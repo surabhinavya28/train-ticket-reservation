@@ -74,7 +74,7 @@ jobs:
         env:
           URL: ${{ secrets.tomcat_url }}
           USER: ${{ secrets.tomcat_user }}
-          PASS: ${{ secrets.tomcat_password }}
+          PASS: ${{ secrets.tomcat_pass }}
         run: |
           WAR_FILE=$(ls *.war | head -n 1)
           echo "Deploying $WAR_FILE to DEV ($URL)"
