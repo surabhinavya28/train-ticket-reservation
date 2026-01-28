@@ -58,7 +58,7 @@ jobs:
         run: |
           mvn deploy \
             -DskipTests \
-            -DaltDeploymentRepository=nexus::default::http://3.101.133.169:8081/repository/maven-snapshots/
+            -DaltDeploymentRepository=nexus::http://3.101.133.169:8081/repository/maven-snapshots
 
   deploy-dev:
     needs: build
