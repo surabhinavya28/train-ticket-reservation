@@ -47,7 +47,7 @@ jobs:
             <servers>
               <server>
                 <id>nexus</id>
-                <username>${{ secrets.nexus_user }}</username>
+                <username>${{ secrets.nexus_url }}</username>
                 <password>${{ secrets.nexus_password }}</password>
               </server>
             </servers>
