@@ -27,8 +27,8 @@ jobs:
         run: |
           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=train-ticket-reservation \
-            -Dsonar.host.url=${{ secrets.sonar_url }} \
-            -Dsonar.token=${{ secrets.sonar_password }}
+            -Dsonar.host.url=${{ secrets.SONAR_URL }} \
+            -Dsonar.token=${{ secrets.SONAR_PASSWORD }}
 
       - name: Find WAR file
         run: echo "WAR_FILE=$(ls target/*.war | head -n 1)" >> $GITHUB_ENV
@@ -47,8 +47,8 @@ jobs:
             <servers>
               <server>
                 <id>nexus</id>
-                <username>${{ secrets.nexus_url }}</username>
-                <password>${{ secrets.nexus_password }}</password>
+                <username>${{ secrets.NEXUS_USER }}</username>
+                <password>${{ secrets.NEXUS_PASSWORD }}</password>
               </server>
             </servers>
           </settings>
@@ -58,7 +58,7 @@ jobs:
         run: |
           mvn deploy \
             -DskipTests \
-            -DaltDeploymentRepository=nexus::default::${{ secrets.nexus_url }}
+            -DaltDeploymentRepository=nexus::default::${{ secrets.NEXUS_URL }}
 
   deploy-dev:
     needs: build
@@ -72,9 +72,9 @@ jobs:
 
       - name: Deploy to DEV
         env:
-          URL: ${{ secrets.tomcat_url }}
-          USER: ${{ secrets.tomcat_user }}
-          PASS: ${{ secrets.tomcat_pass }}
+          URL: ${{ secrets.TOMCAT_URL }}
+          USER: ${{ secrets.TOMCAT_USER }}
+          PASS: ${{ secrets.TOMCAT_PASS }}
         run: |
           WAR_FILE=$(ls *.war | head -n 1)
           echo "Deploying $WAR_FILE to DEV ($URL)"
