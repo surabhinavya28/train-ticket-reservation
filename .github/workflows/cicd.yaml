@@ -70,6 +70,23 @@ jobs:
         with:
           name: war-file
 
+      - name: Verify WAR file
+        run: |
+          ls -l
+          echo "WAR file found:"
+          ls *.war
+
+      # 🔍 DEBUG STEP (VERY IMPORTANT)
+      - name: Debug Tomcat Authentication
+        env:
+          URL: ${{ secrets.TOMCAT_URL_DEV }}
+          USER: ${{ secrets.TOMCAT_USER_DEV }}
+          PASS: ${{ secrets.TOMCAT_PASS_DEV }}
+        run: |
+          echo "Testing Tomcat login..."
+          curl -v -u "$USER:$PASS" "$URL/list"
+
+      # 🚀 DEPLOY STEP
       - name: Deploy to DEV
         env:
           URL: ${{ secrets.TOMCAT_URL_DEV }}
@@ -79,6 +96,6 @@ jobs:
           WAR_FILE=$(ls *.war | head -n 1)
           echo "Deploying $WAR_FILE to DEV ($URL)"
 
-          curl -u "$USER:$PASS" --fail \
+          curl -v -u "$USER:$PASS" --fail \
             --upload-file "$WAR_FILE" \
             "$URL/deploy?path=/train-ticket-reservation&update=true"
