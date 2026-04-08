@@ -7,7 +7,7 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPOSITORY: my-app
+  ECR_REPOSITORY: vcube-142
   ECS_CLUSTER: my-cluster
   ECS_SERVICE: my-service
   CONTAINER_NAME: my-container
