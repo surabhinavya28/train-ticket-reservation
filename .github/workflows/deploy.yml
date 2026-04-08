@@ -1,4 +1,4 @@
-name: Build and Deploy to ECS
+name: Deploy to ECR
 
 on:
   push:
