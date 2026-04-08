@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  AWS_REGION: ap-south-1
+  AWS_REGION: us-west-1
   ECR_REPOSITORY: vcube-142
   ECS_CLUSTER: my-cluster
   ECS_SERVICE: my-service
