@@ -76,36 +76,20 @@ jobs:
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           docker push $ACCOUNT_ID.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-      - name: Install kubectl
+      - name: Update ECS Task Definition
         run: |
-          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          sed -i "s|<IMAGE>|$ACCOUNT_ID.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}|g" task-definition.json
+          cat task-definition.json > new-task.json
 
-    # 7. Update kubeconfig for EKS
-      - name: Update kubeconfig
-        run: |
-         aws eks update-kubeconfig \
-          --name ${{ secrets.EKS_CLUSTER_NAME }} \
-          --region ${{ secrets.AWS_REGION }}
-          
-    #  CREATE NAMESPACE IF NOT PRESENT
-      - name: Apply namespace manifest
-        run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/deployment.yaml -n ${{ secrets.K8S_NAMESPACE }}
-          kubectl apply -f k8s/service.yaml
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: new-task.json
+          service: ${{ secrets.ECS_SERVICE }}
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          wait-for-service-stability: true
 
-    # 8. Deploy to EKS
-      - name: Deploy to EKS
-        run: |
-         ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          kubectl set image deployment/train-ticket-deployment \
-            train-ticket-container=$ACCOUNT_ID.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
-            -n ${{ secrets.K8S_NAMESPACE }}
-
-          kubectl rollout status deployment/train-ticket-deployment \
-            -n ${{ secrets.K8S_NAMESPACE }} --timeout=200s
-
+    
 
             
