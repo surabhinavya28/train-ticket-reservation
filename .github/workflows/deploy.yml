@@ -2,7 +2,7 @@ name: Build and Deploy train-ticket-reservation
 
 on:
   push:
-    branches:
+    branches:   
       - master
   workflow_dispatch:
 
