@@ -1,4 +1,4 @@
-name: Deploy to ECR
+name: Deploy to ECR & ECS
 
 on:
   push:
@@ -10,7 +10,6 @@ env:
   ECR_REPOSITORY: vcube-142
   ECS_CLUSTER: my-cluster
   ECS_SERVICE: my-service
-  CONTAINER_NAME: my-container
 
 jobs:
   deploy:
@@ -21,7 +20,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Configure AWS credentials
+      # 2️⃣ Set up Java (IMPORTANT)
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3️⃣ Build WAR file (VERY IMPORTANT ✅)
+      - name: Build with Maven
+        run: mvn clean package
+
+      # 4️⃣ Debug (optional but helpful)
+      - name: Verify build output
+        run: ls target/
+
+      # 5️⃣ Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -29,12 +43,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # 3️⃣ Login to Amazon ECR
+      # 6️⃣ Login to ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # 4️⃣ Build, tag, and push Docker image
+      # 7️⃣ Build, tag, push Docker image
       - name: Build and Push Docker Image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -43,7 +57,7 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      # 5️⃣ Update ECS service (force new deployment)
+      # 8️⃣ Deploy to ECS
       - name: Deploy to ECS
         run: |
           aws ecs update-service \
